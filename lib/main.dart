@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,15 +14,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Battery App',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -39,9 +31,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int? _batteryLevel;
 
   Future<void> _getBatteryLevel() async {
-
+    const platform = MethodChannel('course.flutter.dev/battery');
+    try {
+      final batteryLevel = await platform.invokeMethod('getBatteryLevel');
+      setState(() {
+        _batteryLevel = _batteryLevel;
+      });
+    } on PlatformException catch (err) {
+      setState(() {
+        _batteryLevel = null;
+      });
+    }
   }
 
   @override
@@ -55,8 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('Native Code'),
       ),
-      body: const Center(
-        child: Text('Battery Level: ...'),
+      body: Center(
+        child: Text('Battery Level: $_batteryLevel'),
       ),
     );
   }
